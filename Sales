@@ -1,0 +1,405 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Perfume Sales & Expense Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .counter-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .summary-value {
+            font-weight: 600;
+        }
+        .profit-positive {
+            color: #10b981; /* Tailwind green-600 */
+        }
+        .profit-negative {
+            color: #ef4444; /* Tailwind red-500 */
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .delete-btn {
+            background-color: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .delete-btn:hover {
+             background-color: #fecaca;
+        }
+        .entry-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9fafb;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+        }
+        .entry-desc {
+            flex: 1;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .entry-date {
+            color: #6b7280;
+            margin-right: 0.5rem;
+            min-width: 90px;
+            text-align: right;
+        }
+        .entry-amount {
+            font-weight: 600;
+            min-width: 80px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Perfume Sales Tracker</h1>
+            <p class="text-gray-500 mt-2">Record daily sales and expenses for your counters.</p>
+        </header>
+
+        <!-- Grand Total Summary -->
+        <div class="counter-card p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Overall Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div>
+                    <p class="text-gray-500">Total Sales</p>
+                    <p id="grand-total-sales" class="summary-value text-2xl text-green-600">OMR 0.000</p>
+                </div>
+                <div>
+                    <p class="text-gray-500">Total Expenses</p>
+                    <p id="grand-total-expenses" class="summary-value text-2xl text-red-500">OMR 0.000</p>
+                </div>
+                <div>
+                    <p class="text-gray-500">Net Profit</p>
+                    <p id="grand-total-profit" class="summary-value text-2xl text-gray-800">OMR 0.000</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Counters -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Counter 1 -->
+            <div id="counter-1" class="counter-card p-6 space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800 text-center">Counter 1</h2>
+                
+                <!-- Summary for Counter 1 -->
+                <div class="grid grid-cols-3 gap-2 text-center border-b pb-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Sales</p>
+                        <p id="c1-total-sales" class="summary-value text-lg text-green-600">OMR 0.000</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Expenses</p>
+                        <p id="c1-total-expenses" class="summary-value text-lg text-red-500">OMR 0.000</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Profit</p>
+                        <p id="c1-profit" class="summary-value text-lg">OMR 0.000</p>
+                    </div>
+                </div>
+
+                <!-- Forms for Counter 1 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Add Sale Form -->
+                    <form id="c1-add-sale" class="space-y-3">
+                        <h3 class="font-semibold text-lg">Add Sale</h3>
+                        <input type="text" id="c1-sale-desc" class="form-input" placeholder="Sale Description" required />
+                        <input type="date" id="c1-sale-date" class="form-input" required />
+                        <input type="number" id="c1-sale-amount" class="form-input" placeholder="Amount (OMR)" step="0.001" min="0" required />
+                        <button type="submit" class="btn btn-primary w-full">Add Sale</button>
+                    </form>
+                    <!-- Add Expense Form -->
+                    <form id="c1-add-expense" class="space-y-3">
+                        <h3 class="font-semibold text-lg">Add Expense</h3>
+                        <input type="text" id="c1-expense-desc" class="form-input" placeholder="Expense Description" required />
+                        <input type="date" id="c1-expense-date" class="form-input" required />
+                        <input type="number" id="c1-expense-amount" class="form-input" placeholder="Amount (OMR)" step="0.001" min="0" required />
+                        <button type="submit" class="btn btn-primary w-full">Add Expense</button>
+                    </form>
+                </div>
+                
+                <!-- Lists for Counter 1 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2">Sales Log</h3>
+                        <div id="c1-sales-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2">Expenses Log</h3>
+                        <div id="c1-expenses-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Counter 2 -->
+            <div id="counter-2" class="counter-card p-6 space-y-6">
+                 <h2 class="text-2xl font-bold text-gray-800 text-center">Counter 2</h2>
+                
+                <!-- Summary for Counter 2 -->
+                 <div class="grid grid-cols-3 gap-2 text-center border-b pb-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Sales</p>
+                        <p id="c2-total-sales" class="summary-value text-lg text-green-600">OMR 0.000</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Expenses</p>
+                        <p id="c2-total-expenses" class="summary-value text-lg text-red-500">OMR 0.000</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Profit</p>
+                        <p id="c2-profit" class="summary-value text-lg">OMR 0.000</p>
+                    </div>
+                </div>
+
+                <!-- Forms for Counter 2 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Add Sale Form -->
+                    <form id="c2-add-sale" class="space-y-3">
+                        <h3 class="font-semibold text-lg">Add Sale</h3>
+                        <input type="text" id="c2-sale-desc" class="form-input" placeholder="Sale Description" required />
+                        <input type="date" id="c2-sale-date" class="form-input" required />
+                        <input type="number" id="c2-sale-amount" class="form-input" placeholder="Amount (OMR)" step="0.001" min="0" required />
+                        <button type="submit" class="btn btn-primary w-full">Add Sale</button>
+                    </form>
+                    <!-- Add Expense Form -->
+                    <form id="c2-add-expense" class="space-y-3">
+                        <h3 class="font-semibold text-lg">Add Expense</h3>
+                        <input type="text" id="c2-expense-desc" class="form-input" placeholder="Expense Description" required />
+                        <input type="date" id="c2-expense-date" class="form-input" required />
+                        <input type="number" id="c2-expense-amount" class="form-input" placeholder="Amount (OMR)" step="0.001" min="0" required />
+                        <button type="submit" class="btn btn-primary w-full">Add Expense</button>
+                    </form>
+                </div>
+                
+                <!-- Lists for Counter 2 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2">Sales Log</h3>
+                        <div id="c2-sales-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-2">Expenses Log</h3>
+                        <div id="c2-expenses-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+(() => {
+    // Data storage for counters
+    const counters = {
+        c1: { sales: [], expenses: [] },
+        c2: { sales: [], expenses: [] }
+    };
+
+    // Utility: format number as OMR currency with 3 decimals
+    function formatOMR(amount) {
+        return 'OMR ' + amount.toFixed(3);
+    }
+
+    // Utility: create an entry DOM element (sale or expense)
+    function createEntryElement(counterId, type, entry, index) {
+        const div = document.createElement('div');
+        div.className = 'entry-item';
+
+        const desc = document.createElement('div');
+        desc.className = 'entry-desc';
+        desc.textContent = entry.description;
+
+        const date = document.createElement('div');
+        date.className = 'entry-date';
+        date.textContent = entry.date;
+
+        const amount = document.createElement('div');
+        amount.className = 'entry-amount';
+        amount.textContent = formatOMR(entry.amount);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.textContent = 'Delete';
+        delBtn.title = 'Delete this entry';
+        delBtn.addEventListener('click', () => {
+            // Remove entry from data and update UI
+            counters[counterId][type].splice(index, 1);
+            updateCounterUI(counterId);
+            updateGrandTotals();
+        });
+
+        div.appendChild(desc);
+        div.appendChild(date);
+        div.appendChild(amount);
+        div.appendChild(delBtn);
+
+        return div;
+    }
+
+    // Update UI for a specific counter
+    function updateCounterUI(counterId) {
+        const salesList = document.getElementById(`${counterId}-sales-list`);
+        const expensesList = document.getElementById(`${counterId}-expenses-list`);
+        const totalSalesElem = document.getElementById(`${counterId}-total-sales`);
+        const totalExpensesElem = document.getElementById(`${counterId}-total-expenses`);
+        const profitElem = document.getElementById(`${counterId}-profit`);
+
+        // Clear lists
+        salesList.innerHTML = '';
+        expensesList.innerHTML = '';
+
+        // Add sales entries
+        counters[counterId].sales.forEach((entry, i) => {
+            salesList.appendChild(createEntryElement(counterId, 'sales', entry, i));
+        });
+
+        // Add expenses entries
+        counters[counterId].expenses.forEach((entry, i) => {
+            expensesList.appendChild(createEntryElement(counterId, 'expenses', entry, i));
+        });
+
+        // Calculate totals
+        const totalSales = counters[counterId].sales.reduce((sum, e) => sum + e.amount, 0);
+        const totalExpenses = counters[counterId].expenses.reduce((sum, e) => sum + e.amount, 0);
+        const profit = totalSales - totalExpenses;
+
+        // Update summary text
+        totalSalesElem.textContent = formatOMR(totalSales);
+        totalExpensesElem.textContent = formatOMR(totalExpenses);
+        profitElem.textContent = formatOMR(profit);
+
+        // Color profit text
+        profitElem.classList.remove('profit-positive', 'profit-negative');
+        if (profit > 0) {
+            profitElem.classList.add('profit-positive');
+        } else if (profit < 0) {
+            profitElem.classList.add('profit-negative');
+        }
+    }
+
+    // Update grand totals across all counters
+    function updateGrandTotals() {
+        const grandSalesElem = document.getElementById('grand-total-sales');
+        const grandExpensesElem = document.getElementById('grand-total-expenses');
+        const grandProfitElem = document.getElementById('grand-total-profit');
+
+        let grandSales = 0;
+        let grandExpenses = 0;
+
+        for (const counterId in counters) {
+            grandSales += counters[counterId].sales.reduce((sum, e) => sum + e.amount, 0);
+            grandExpenses += counters[counterId].expenses.reduce((sum, e) => sum + e.amount, 0);
+        }
+
+        const grandProfit = grandSales - grandExpenses;
+
+        grandSalesElem.textContent = formatOMR(grandSales);
+        grandExpensesElem.textContent = formatOMR(grandExpenses);
+        grandProfitElem.textContent = formatOMR(grandProfit);
+
+        grandProfitElem.classList.remove('profit-positive', 'profit-negative');
+        if (grandProfit > 0) {
+            grandProfitElem.classList.add('profit-positive');
+        } else if (grandProfit < 0) {
+            grandProfitElem.classList.add('profit-negative');
+        }
+    }
+
+    // Handle form submissions for adding sales or expenses
+    function setupFormHandlers(counterId) {
+        // Add Sale
+        const saleForm = document.getElementById(`${counterId}-add-sale`);
+        saleForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const desc = document.getElementById(`${counterId}-sale-desc`).value.trim();
+            const date = document.getElementById(`${counterId}-sale-date`).value;
+            const amount = parseFloat(document.getElementById(`${counterId}-sale-amount`).value);
+
+            if (!desc || !date || isNaN(amount) || amount < 0) return;
+
+            counters[counterId].sales.push({ description: desc, date, amount });
+            updateCounterUI(counterId);
+            updateGrandTotals();
+
+            saleForm.reset();
+        });
+
+        // Add Expense
+        const expenseForm = document.getElementById(`${counterId}-add-expense`);
+        expenseForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const desc = document.getElementById(`${counterId}-expense-desc`).value.trim();
+            const date = document.getElementById(`${counterId}-expense-date`).value;
+            const amount = parseFloat(document.getElementById(`${counterId}-expense-amount`).value);
+
+            if (!desc || !date || isNaN(amount) || amount < 0) return;
+
+            counters[counterId].expenses.push({ description: desc, date, amount });
+            updateCounterUI(counterId);
+            updateGrandTotals();
+
+            expenseForm.reset();
+        });
+    }
+
+    // Initialize all
+    function init() {
+        setupFormHandlers('c1');
+        setupFormHandlers('c2');
+        updateCounterUI('c1');
+        updateCounterUI('c2');
+        updateGrandTotals();
+    }
+
+    // Run init on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+</body>
+</html>
+```
